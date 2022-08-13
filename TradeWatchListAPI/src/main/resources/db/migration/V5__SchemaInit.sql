@@ -1,0 +1,1 @@
+ALTER TABLE market_summary MODIFY previous_close DOUBLE;
