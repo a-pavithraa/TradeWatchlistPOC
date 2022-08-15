@@ -14,23 +14,30 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/ingestion")
-@Tag(name="DataIngestion")
+@Tag(name = "APIs for Data Ingestion")
 public class IngestionController {
 	@Autowired
 	private IngestionService ingestionService;
-	
+
 	@PostMapping("/trendingTickers/{region}")
-	@ResponseStatus(HttpStatus.CREATED)	
+	@ResponseStatus(HttpStatus.CREATED)
 	public void updateTrendingTickers(@PathVariable String region) {
 		ingestionService.refreshTrendingTickers(region);
-		
+
 	}
-	
+
 	@PostMapping("/marketSummary/{region}")
-	@ResponseStatus(HttpStatus.CREATED)	
+	@ResponseStatus(HttpStatus.CREATED)
 	public void updateMarketSummary(@PathVariable String region) {
 		ingestionService.refreshMarketSummary(region);
-		
+
+	}
+
+	@PostMapping("/symbols")
+	@ResponseStatus(HttpStatus.CREATED)
+	public void insertSymbolsData() {
+
+		ingestionService.saveSymbols();
 	}
 
 }

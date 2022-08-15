@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
 import com.tradewatchlist.api.FeignConfig;
+import com.tradewatchlist.model.rapidapi.chart.ChartDetails;
 import com.tradewatchlist.model.rapidapi.marketsummary.MarketSummaryApiResponse;
 import com.tradewatchlist.model.rapidapi.trendingticker.TrendingTicker;
 
@@ -17,5 +19,9 @@ public interface RapidApiClient {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/market/v2/get-summary", consumes = "application/json")
 	MarketSummaryApiResponse getMarketSummary(@RequestParam(value="region")String region);
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/stock/v2/get-chart", consumes = "application/json")	
+	ChartDetails getChartListForSymbol(@RequestParam(value="symbol")String symbols,@RequestParam(value="interval")String interval,@RequestParam(value="range")String range,@RequestParam(value="region")String region);
+	
 
 }

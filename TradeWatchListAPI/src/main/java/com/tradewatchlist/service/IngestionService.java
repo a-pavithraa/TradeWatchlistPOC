@@ -3,16 +3,23 @@ package com.tradewatchlist.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tradewatchlist.api.iex.IexAPIRestClient;
 import com.tradewatchlist.api.rapidapi.RapidApiClient;
+
 import com.tradewatchlist.entity.MarketSummary;
 import com.tradewatchlist.entity.TrendingTickers;
+import com.tradewatchlist.model.iex.SymbolApiResponse;
 import com.tradewatchlist.model.rapidapi.marketsummary.MarketSummaryApiResponse;
 import com.tradewatchlist.model.rapidapi.trendingticker.TrendingTicker;
 import com.tradewatchlist.repository.MarketSummaryRepo;
+import com.tradewatchlist.repository.SymbolsRepo;
 import com.tradewatchlist.repository.TrendingTickersRepo;
+
 
 import lombok.AllArgsConstructor;
 
@@ -21,8 +28,10 @@ import lombok.AllArgsConstructor;
 public class IngestionService {
 	
 	private RapidApiClient rapidApiClient;
+	private IexAPIRestClient iexClient;
 	private TrendingTickersRepo trendingTickersRepo;
 	private MarketSummaryRepo marketSummaryRepo;
+	private SymbolsRepo symbolRepo;
 	
 	@Transactional
 	public void refreshTrendingTickers(String region) {
@@ -48,6 +57,7 @@ public class IngestionService {
 		
 	}
 
+	@Transactional
 	public void refreshMarketSummary(String region) {
 		marketSummaryRepo.deleteByRegion(region);
 		MarketSummaryApiResponse marketSummaryApiResponse=rapidApiClient.getMarketSummary(region);
@@ -64,6 +74,15 @@ public class IngestionService {
 		}).collect(Collectors.toList());
 		marketSummaryRepo.saveAll(marketSummaryList);
 		
+		
+	}
+	
+	@Transactional
+	public void saveSymbols() {
+		List<SymbolApiResponse> symbolsApiResponse = iexClient.getSymbols(); 
+		ModelMapper mapper = new ModelMapper();
+		List<com.tradewatchlist.entity.Symbol> symbols =mapper.map(symbolsApiResponse, new TypeToken<List<com.tradewatchlist.entity.Symbol>>(){}.getType());		
+		symbolRepo.saveAll(symbols);
 		
 	}
 	
